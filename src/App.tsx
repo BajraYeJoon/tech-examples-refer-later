@@ -51,6 +51,12 @@ export default function App() {
               >
                 Auth
               </Link>
+              <Link
+                to="/swapy"
+                className="text-primary hover:text-primary-foreground transition-colors"
+              >
+                Swapy
+              </Link>
             </nav>
           </div>
         </div>

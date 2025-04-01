@@ -10,6 +10,7 @@ import { Dashboard } from "../components/Dashboard";
 import Auth from "../components/auth";
 import ProtectedRoute from "../components/auth/protected-route";
 import Profile from "../components/auth/profile";
+import Swapy from "../components/swapy/swapy";
 
 export const router = createBrowserRouter([
   {
@@ -56,6 +57,10 @@ export const router = createBrowserRouter([
             <Profile />,
           </ProtectedRoute>
         ),
+      },
+      {
+        path: "/swapy",
+        element: <Swapy />,
       },
     ],
   },

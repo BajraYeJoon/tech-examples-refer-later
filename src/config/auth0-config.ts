@@ -4,4 +4,6 @@ export const auth0Config = {
   authorizationParams: {
     redirect_uri: `${window.location.origin}/profile`,
   },
+  cacheLocation: "localStorage",
+  useRefreshTokens: true,
 };
