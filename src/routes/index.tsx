@@ -1,16 +1,46 @@
-import { createBrowserRouter } from 'react-router'
-import HookFormTutorial from '../components/HookFormTutorial'
-import ProductList from '../components/ProductList'
+import { createBrowserRouter } from "react-router";
+import HookFormTutorial from "../components/HookFormTutorial";
+import ProductList from "../components/ProductList";
+import { AirbnbForm } from "../components/AirbnbForm/AirbnbForm";
+import { LaunchList } from "../components/SpaceX/LaunchList";
+import { LaunchListTanstack } from "../components/SpaceX/LaunchListTanstack";
+import { LaunchDetail } from "../components/SpaceX/LaunchDetail";
+import App from "../App";
+import { Dashboard } from "../components/Dashboard";
 
 export const router = createBrowserRouter([
   {
-    path: '/',
-    element: <ProductList />,
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        path: "/",
+        element: <ProductList />,
+      },
+      {
+        path: "/hook-form",
+        element: <HookFormTutorial />,
+      },
+      {
+        path: "/airbnb-form",
+        element: <AirbnbForm />,
+      },
+      {
+        path: "/spacex",
+        element: <LaunchList />,
+      },
+      {
+        path: "/spacex-tanstack",
+        element: <LaunchListTanstack />,
+      },
+      {
+        path: "/spacex/launch/:id",
+        element: <LaunchDetail />,
+      },
+      {
+        path: "/finance",
+        element: <Dashboard />,
+      },
+    ],
   },
-
-  {
-    path: '/hook-form',
-    element: <HookFormTutorial />,
-  },
-
-]) 
+]);
