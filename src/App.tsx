@@ -45,6 +45,12 @@ export default function App() {
               >
                 Finance Tracker
               </Link>
+              <Link
+                to="/auth"
+                className="text-primary hover:text-primary-foreground transition-colors"
+              >
+                Auth
+              </Link>
             </nav>
           </div>
         </div>

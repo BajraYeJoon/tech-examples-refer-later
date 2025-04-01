@@ -7,6 +7,9 @@ import { LaunchListTanstack } from "../components/SpaceX/LaunchListTanstack";
 import { LaunchDetail } from "../components/SpaceX/LaunchDetail";
 import App from "../App";
 import { Dashboard } from "../components/Dashboard";
+import Auth from "../components/auth";
+import ProtectedRoute from "../components/auth/protected-route";
+import Profile from "../components/auth/profile";
 
 export const router = createBrowserRouter([
   {
@@ -40,6 +43,19 @@ export const router = createBrowserRouter([
       {
         path: "/finance",
         element: <Dashboard />,
+      },
+      {
+        path: "/auth",
+        element: <Auth />,
+      },
+      {
+        path: "/profile",
+
+        element: (
+          <ProtectedRoute>
+            <Profile />,
+          </ProtectedRoute>
+        ),
       },
     ],
   },
