@@ -57,6 +57,12 @@ export default function App() {
               >
                 Swapy
               </Link>
+              <Link
+                to="/canvas"
+                className="text-primary hover:text-primary-foreground transition-colors"
+              >
+                Canvas
+              </Link>
             </nav>
           </div>
         </div>

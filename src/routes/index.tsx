@@ -11,6 +11,7 @@ import Auth from "../components/auth";
 import ProtectedRoute from "../components/auth/protected-route";
 import Profile from "../components/auth/profile";
 import Swapy from "../components/swapy/swapy";
+import Canvas from "../components/canvas/canvas";
 
 export const router = createBrowserRouter([
   {
@@ -61,6 +62,10 @@ export const router = createBrowserRouter([
       {
         path: "/swapy",
         element: <Swapy />,
+      },
+      {
+        path: "/canvas",
+        element: <Canvas />,
       },
     ],
   },
