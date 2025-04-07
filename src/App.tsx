@@ -63,6 +63,12 @@ export default function App() {
               >
                 Canvas
               </Link>
+              <Link
+                to="/photo-lite"
+                className="text-primary hover:text-primary-foreground transition-colors"
+              >
+                Photo Lite
+              </Link>
             </nav>
           </div>
         </div>

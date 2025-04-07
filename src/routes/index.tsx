@@ -12,6 +12,7 @@ import ProtectedRoute from "../components/auth/protected-route";
 import Profile from "../components/auth/profile";
 import Swapy from "../components/swapy/swapy";
 import Canvas from "../components/canvas/canvas";
+import PhotoLite from "../components/photo-lite";
 
 export const router = createBrowserRouter([
   {
@@ -66,6 +67,10 @@ export const router = createBrowserRouter([
       {
         path: "/canvas",
         element: <Canvas />,
+      },
+      {
+        path: "/photo-lite",
+        element: <PhotoLite />,
       },
     ],
   },
