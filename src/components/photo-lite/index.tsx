@@ -9,6 +9,23 @@ const PhotoLite = () => {
 
   useCanvas(canvasRef as React.RefObject<HTMLCanvasElement>);
 
+  // const getCursorStyles = () => {
+  //   switch (currentTool) {
+  //     case "brush":
+  //       return "cursor-crosshair";
+  //     case "eraser":
+  //       return "cursor-cell";
+  //     case "move":
+  //       return "cursor-move";
+  //     case "text":
+  //       return "cursor-text";
+  //     case "select":
+  //       return "cursor-pointer";
+  //     default:
+  //       return "cursor-default";
+  //   }
+  // };
+
   return (
     <div className="flex flex-col gap-4">
       <div>
@@ -26,26 +43,105 @@ const PhotoLite = () => {
           >
             Brush
           </button>
+          <button
+            type="button"
+            className={`p-2 rounded ${
+              currentTool === "eraser" ? "bg-blue-500" : "bg-gray-600"
+            }`}
+            onClick={() => setCurrentTool("eraser")}
+          >
+            Eraser
+          </button>
         </div>
         <div>
           <input
             type="range"
             min={1}
             max={10}
-            value={tools.brush.size}
+            value={tools[currentTool as keyof typeof tools].size}
             onChange={(e) =>
-              updateTool("brush", "size", Number(e.target.value))
+              updateTool(currentTool, "size", Number(e.target.value))
             }
           />
           <span className="capitalize">
-            {currentTool} Size: {tools.brush.size}
+            {currentTool} Size: {tools[currentTool as keyof typeof tools].size}
           </span>
 
-          <input
-            type="color"
-            value={tools.brush.color}
-            onChange={(e) => updateTool("brush", "color", e.target.value)}
-          />
+          {currentTool === "brush" && (
+            <input
+              type="color"
+              value={tools.brush.color}
+              onChange={(e) => updateTool("brush", "color", e.target.value)}
+            />
+          )}
+
+          {currentTool === "brush" && (
+            <div>
+              <span>opacity</span>
+              <input
+                type="range"
+                min={0}
+                step={0.1}
+                max={1}
+                value={tools.brush.opacity}
+                onChange={(e) =>
+                  updateTool("brush", "opacity", Number(e.target.value))
+                }
+              />
+            </div>
+          )}
+
+          {currentTool === "brush" && (
+            <div>
+              <span>Change Style:</span>
+              <select
+                name="brush-style"
+                id="change-brush-style"
+                className="*:text-black"
+                onChange={(e) => updateTool("brush", "style", e.target.value)}
+              >
+                <option value="solid">Solid</option>
+                <option value="dashed">Dashed</option>
+                <option value="dotted">Dotted</option>
+              </select>
+            </div>
+          )}
+
+          {currentTool === "brush" && (
+            <div>
+              <span>Change Shape: </span>
+              <select
+                name="brush-shape"
+                id="change-brush-shape"
+                className="*:text-black"
+                onChange={(e) => updateTool("brush", "shape", e.target.value)}
+              >
+                <option value="none">None</option>
+                <option value="circle">Circle</option>
+                <option value="square">Square</option>
+                <option value="calligraphy">Calligraphy</option>
+              </select>
+            </div>
+          )}
+
+          {currentTool === "brush" && (
+            <div>
+              <span>Change Texture: </span>
+              <select
+                name="brush-texture"
+                id="change-brush-texture"
+                className="*:text-black"
+                onChange={(e) => updateTool("brush", "texture", e.target.value)}
+              >
+                <option value="none">None</option>
+                <option value="chalk">Chalk</option>
+                <option value="pencil">Pencil</option>
+                <option value="watercolor">Watercolor</option>
+                <option value="spray">Spray</option>
+                <option value="gradient">Gradient</option>
+              </select>
+            </div>
+          )}
         </div>
       </div>
       <div className="h-[100vh] relative  border bg-gray-200 flex items-center justify-center p-4">

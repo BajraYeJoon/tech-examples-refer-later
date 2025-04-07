@@ -7,23 +7,38 @@ interface Tool {
   color: string;
   opacity: number;
   style: "solid" | "dashed" | "dotted";
+  shape: "none" | "circle" | "square" | "calligraphy";
+  texture: "none" | "chalk" | "pencil" | "watercolor" | "spray" | "gradient";
 }
 
+type EraserTool = Pick<Tool, "name" | "size">;
+
+type Tools = {
+  brush: Tool;
+  eraser: EraserTool;
+};
+
+type ToolName = keyof Tools;
+type ToolProperty<T extends ToolName> = keyof Tools[T];
+
 interface PhotoEditorStore {
-  currentTool: string;
-  tools: {
-    brush: Tool;
-  };
+  currentTool: ToolName;
+  tools: Tools;
   mousePosition: {
     x: number;
     y: number;
   };
 
   //actions
-  setCurrentTool: (tool: string) => void;
-  updateTool: (toolName: string, property: keyof Tool, value: any) => void;
+  setCurrentTool: (tool: ToolName) => void;
+  updateTool: <T extends ToolName>(
+    toolName: T,
+    property: ToolProperty<T>,
+    value: Tools[T][ToolProperty<T>]
+  ) => void;
   setMousePosition: (x: number, y: number) => void;
 }
+
 export const usePhotoEditorStore = create<PhotoEditorStore>()(
   immer((set) => ({
     currentTool: "brush",
@@ -34,6 +49,12 @@ export const usePhotoEditorStore = create<PhotoEditorStore>()(
         color: "#000000",
         opacity: 1,
         style: "solid",
+        shape: "none",
+        texture: "none",
+      },
+      eraser: {
+        name: "eraser",
+        size: 20, // Larger default size for eraser
       },
     },
     mousePosition: {
@@ -46,10 +67,13 @@ export const usePhotoEditorStore = create<PhotoEditorStore>()(
         state.currentTool = tool;
       });
     },
-    updateTool: (toolName: string, property: keyof Tool, value: any) =>
+    updateTool: <T extends ToolName>(
+      toolName: T,
+      property: ToolProperty<T>,
+      value: Tools[T][ToolProperty<T>]
+    ) =>
       set((state) => {
-        state.tools[toolName as keyof PhotoEditorStore["tools"]][property] =
-          value;
+        state.tools[toolName][property] = value;
       }),
 
     setMousePosition(x, y) {

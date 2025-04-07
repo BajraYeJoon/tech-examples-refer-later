@@ -1,53 +1,54 @@
-# PhotoLite - A Simple Online Photo Editor
+# React + TypeScript + Vite
 
-PhotoLite is a lightweight, browser-based photo editing application inspired by Photopea. It provides basic image editing capabilities with a clean, intuitive interface.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Features
+Currently, two official plugins are available:
 
-- **Drawing Tools**: Brush tool with adjustable size and color
-- **Eraser Tool**: Remove parts of your drawing
-- **Line Tool**: Draw straight lines
-- **Color Picker**: Choose any color for your brush
-- **Size Adjustment**: Control the brush/eraser/line thickness
-- **Clear Canvas**: Start over with a fresh white canvas
-- **Save Image**: Download your creation as a PNG file
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## How to Use
+## Expanding the ESLint configuration
 
-1. **Select a Tool**: Choose between Brush, Eraser, or Line tool from the left sidebar
-2. **Adjust Settings**: Set your preferred color and brush size from the top toolbar
-3. **Draw on Canvas**: Click and drag on the white canvas to create your artwork
-4. **Save Your Work**: Click the "Save" button to download your image
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-## Implementation Details
+```js
+export default tseslint.config({
+  extends: [
+    // Remove ...tseslint.configs.recommended and replace with this
+    ...tseslint.configs.recommendedTypeChecked,
+    // Alternatively, use this for stricter rules
+    ...tseslint.configs.strictTypeChecked,
+    // Optionally, add this for stylistic rules
+    ...tseslint.configs.stylisticTypeChecked,
+  ],
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
+```
 
-PhotoLite is built with React and TypeScript, using HTML5 Canvas for the drawing functionality. The application uses:
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-- React hooks for state management
-- Canvas API for drawing operations
-- CSS for styling the interface
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-## Technical Stack
-
-- React + TypeScript + Vite
-- HTML5 Canvas API
-- TailwindCSS for styling
-
-## Future Enhancements
-
-- Layer support
-- Image import/upload
-- More tools (shapes, text, filters)
-- Undo/redo functionality
-- Zoom and pan capabilities
-
-## Getting Started
-
-To run PhotoLite locally:
-
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Start the development server: `npm run dev`
-4. Open your browser to the local development URL
-
-Enjoy creating with PhotoLite!
+export default tseslint.config({
+  plugins: {
+    // Add the react-x and react-dom plugins
+    'react-x': reactX,
+    'react-dom': reactDom,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended typescript rules
+    ...reactX.configs['recommended-typescript'].rules,
+    ...reactDom.configs.recommended.rules,
+  },
+})
+```
