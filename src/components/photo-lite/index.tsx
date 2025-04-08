@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePhotoEditorStore } from "../../store/usePhotoEditor";
 import { useCanvas } from "../../hooks/useCanvas";
 import { Button } from "../ui/button";
@@ -17,20 +17,199 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { Card } from "../ui/card";
-import { Brush, Delete, Eraser } from "lucide-react";
+import { Brush, Delete, Eraser, ImagePlus } from "lucide-react";
 
 const PhotoLite = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isImageMode, setIsImageMode] = useState(false);
   const {
     currentTool,
     tools,
     mousePosition,
     setCurrentTool,
     updateTool,
+    images,
+    addImage,
+    selectImage,
+    selectedImage,
+    updateImagePosition,
+    updateImageSize,
     clearCanvas,
   } = usePhotoEditorStore();
 
-  useCanvas(canvasRef as React.RefObject<HTMLCanvasElement>);
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0 });
+  const [initialSize, setInitialSize] = useState({ width: 0, height: 0 });
+
+  useCanvas(canvasRef as React.RefObject<HTMLCanvasElement>, isImageMode);
+
+  const handleImageClick = () => {
+    fileInputRef?.current?.click();
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    console.log("File selected:", file);
+
+    //read the files first
+    const reader = new FileReader();
+    const img = new Image();
+
+    reader.onload = (event) => {
+      if (!event?.target?.result) return;
+
+      img.onload = () => {
+        const canvas = canvasRef?.current;
+        const ctx = canvas?.getContext("2d");
+        if (!canvas || !ctx) return;
+
+        const scale = Math.min(
+          canvas.width / img.width,
+          canvas.height / img.height
+        );
+
+        img.width = img.width * scale;
+        img.height = img.height * scale;
+
+        addImage(img);
+        // const x = (canvas.width - img.width * scale) / 2;
+        // const y = (canvas.height - img.height * scale) / 2;
+
+        // ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+      };
+
+      img.src = event.target.result as string;
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  const handleCanvasClick = (e: MouseEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // First check if we clicked on a resize handle of the selected image
+    if (selectedImage) {
+      const selectedImg = images.find((img) => img.id === selectedImage);
+      if (selectedImg) {
+        const handleSize = 10;
+        const isOnHandle =
+          x >= selectedImg.x + selectedImg.width - handleSize &&
+          x <= selectedImg.x + selectedImg.width + handleSize &&
+          y >= selectedImg.y + selectedImg.height - handleSize &&
+          y <= selectedImg.y + selectedImg.height + handleSize;
+
+        if (isOnHandle) {
+          // If clicking on handle, keep the image selected
+          return;
+        }
+      }
+    }
+
+    // Then check if clicking on any image
+    const clickedImage = images.find(
+      (img) =>
+        x >= img.x &&
+        x <= img.x + img.width &&
+        y >= img.y &&
+        y <= img.y + img.height
+    );
+
+    if (clickedImage) {
+      selectImage(clickedImage.id);
+      setIsImageMode(true);
+    } else {
+      setIsImageMode(false);
+      selectImage(null);
+    }
+  };
+
+  const handleMouseDown = (e: MouseEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas || !selectedImage) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const selectedImg = images.find((img) => img.id === selectedImage);
+    if (selectedImg) {
+      const handleSize = 10;
+      const isOnHandle =
+        x >= selectedImg.x + selectedImg.width - handleSize &&
+        x <= selectedImg.x + selectedImg.width + handleSize &&
+        y >= selectedImg.y + selectedImg.height - handleSize &&
+        y <= selectedImg.y + selectedImg.height + handleSize;
+
+      if (isOnHandle) {
+        setIsResizing(true);
+        setIsImageMode(true);
+        setResizeStart({ x, y });
+        setInitialSize({
+          width: selectedImg.width,
+          height: selectedImg.height,
+        });
+      }
+    }
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isResizing || !selectedImage) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const dx = x - resizeStart.x;
+    const dy = y - resizeStart.y;
+
+    const ratio = initialSize.width / initialSize.height;
+    const newWidth = initialSize.width + dx;
+    const newHeight = newWidth / ratio;
+
+    updateImageSize(selectedImage, newWidth, newHeight);
+  };
+
+  const handleMouseUp = () => {
+    setIsResizing(false);
+    setIsImageMode(false);
+  };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    images.forEach((img) => {
+      ctx.drawImage(img.element, img.x, img.y, img.width, img.height);
+
+      if (img.selected) {
+        ctx.strokeStyle = "#00ff00";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(img.x, img.y, img.width, img.height);
+
+        const handleSize = 10;
+        ctx.fillStyle = "#00ff00";
+        ctx.fillRect(
+          img.x + img.width - handleSize / 2,
+          img.y + img.height - handleSize / 2,
+          handleSize * 2,
+          handleSize * 2
+        );
+      }
+    });
+  }, [images, selectedImage]);
 
   return (
     <TooltipProvider>
@@ -52,6 +231,29 @@ const PhotoLite = () => {
                 <p>Brush Tool (B)</p>
               </TooltipContent>
             </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant={"ghost"}
+                  onClick={handleImageClick}
+                >
+                  <ImagePlus className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <p>Add Image (I)</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
 
             <Tooltip>
               <TooltipTrigger asChild>
@@ -89,9 +291,24 @@ const PhotoLite = () => {
             </Card>
             <canvas
               ref={canvasRef}
+              onClick={(e: React.MouseEvent<HTMLCanvasElement>) => {
+                handleCanvasClick(e.nativeEvent);
+              }}
               width={800}
               height={800}
               className="bg-white border border-border shadow-lg"
+              onMouseDown={(e: React.MouseEvent<HTMLCanvasElement>) => {
+                if (!isImageMode) {
+                  handleMouseDown(e.nativeEvent);
+                }
+              }}
+              onMouseMove={(e: React.MouseEvent<HTMLCanvasElement>) => {
+                if (isResizing) {
+                  handleMouseMove(e.nativeEvent);
+                }
+              }}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
             >
               Canvas not supported
             </canvas>

@@ -47,7 +47,10 @@ const createPattern = (ctx: CanvasRenderingContext2D, type: string) => {
   return ctx.createPattern(patternCanvas, "repeat");
 };
 
-export const useCanvas = (canvasRef: RefObject<HTMLCanvasElement>) => {
+export const useCanvas = (
+  canvasRef: RefObject<HTMLCanvasElement>,
+  isImageMode: boolean
+) => {
   const { tools, currentTool, setMousePosition } = usePhotoEditorStore();
 
   useEffect(() => {
@@ -149,6 +152,7 @@ export const useCanvas = (canvasRef: RefObject<HTMLCanvasElement>) => {
     let lastY = 0;
 
     const startDrawing = (e: MouseEvent) => {
+      if (isImageMode) return;
       isDrawing = true;
       const rect = canvas.getBoundingClientRect();
       lastX = e.clientX - rect.left;
@@ -170,7 +174,7 @@ export const useCanvas = (canvasRef: RefObject<HTMLCanvasElement>) => {
     };
 
     const draw = (e: MouseEvent) => {
-      if (!isDrawing) return;
+      if (!isDrawing || !isImageMode) return;
 
       const rect = canvas.getBoundingClientRect();
       const currentX = e.clientX - rect.left;
@@ -352,7 +356,7 @@ export const useCanvas = (canvasRef: RefObject<HTMLCanvasElement>) => {
       canvas.removeEventListener("mouseup", stopDrawing);
       canvas.removeEventListener("mouseout", stopDrawing);
     };
-  }, [setMousePosition, tools, currentTool]);
+  }, [setMousePosition, tools, currentTool, isImageMode]);
 
   // Helper function for gradient effect
 };

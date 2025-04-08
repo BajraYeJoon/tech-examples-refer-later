@@ -11,6 +11,16 @@ interface Tool {
   texture: "none" | "chalk" | "pencil" | "watercolor" | "spray" | "gradient";
 }
 
+interface ImageObject {
+  id: string;
+  element: HTMLImageElement;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  selected: boolean;
+}
+
 type EraserTool = Pick<Tool, "name" | "size">;
 
 type Tools = {
@@ -28,7 +38,17 @@ interface PhotoEditorStore {
     x: number;
     y: number;
   };
+
+  images: ImageObject[];
+  selectedImage: string | null;
+
   clearCanvasFlag: number;
+
+  // image
+  addImage: (image: HTMLImageElement) => void;
+  selectImage: (id: string | null) => void;
+  updateImagePosition: (id: string, x: number, y: number) => void;
+  updateImageSize: (id: string, width: number, height: number) => void;
 
   //actions
   setCurrentTool: (tool: ToolName) => void;
@@ -65,6 +85,51 @@ export const usePhotoEditorStore = create<PhotoEditorStore>()(
     },
     clearCanvasFlag: 0,
 
+    images: [],
+    selectedImage: null,
+
+    addImage: (image: HTMLImageElement) => {
+      set((state) => {
+        const id = crypto.randomUUID();
+        state.images.push({
+          id,
+          element: image,
+          x: 0,
+          y: 0,
+          width: image.width,
+          height: image.height,
+          selected: true,
+        });
+
+        state.selectedImage = id;
+      });
+    },
+
+    selectImage: (id: string | null) =>
+      set((state) => {
+        state.images.forEach((img) => (img.selected = img.id === id));
+        state.selectedImage = id;
+      }),
+
+    updateImagePosition: (id: string, x: number, y: number) => {
+      set((state) => {
+        const image = state.images.find((img) => img.id === id);
+        if (image) {
+          image.x = x;
+          image.y = y;
+        }
+      });
+    },
+
+    updateImageSize: (id: string, width: number, height: number) => {
+      set((state) => {
+        const image = state.images.find((img) => img.id === id);
+        if (image) {
+          image.width = width;
+          image.height = height;
+        }
+      });
+    },
     setCurrentTool: (tool) => {
       set((state) => {
         state.currentTool = tool;
