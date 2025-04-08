@@ -28,6 +28,7 @@ interface PhotoEditorStore {
     x: number;
     y: number;
   };
+  clearCanvasFlag: number;
 
   //actions
   setCurrentTool: (tool: ToolName) => void;
@@ -37,6 +38,7 @@ interface PhotoEditorStore {
     value: Tools[T][ToolProperty<T>]
   ) => void;
   setMousePosition: (x: number, y: number) => void;
+  clearCanvas: () => void;
 }
 
 export const usePhotoEditorStore = create<PhotoEditorStore>()(
@@ -54,13 +56,14 @@ export const usePhotoEditorStore = create<PhotoEditorStore>()(
       },
       eraser: {
         name: "eraser",
-        size: 20, // Larger default size for eraser
+        size: 20,
       },
     },
     mousePosition: {
       x: 0,
       y: 0,
     },
+    clearCanvasFlag: 0,
 
     setCurrentTool: (tool) => {
       set((state) => {
@@ -80,6 +83,17 @@ export const usePhotoEditorStore = create<PhotoEditorStore>()(
       set((state) => {
         state.mousePosition.x = x;
         state.mousePosition.y = y;
+      });
+    },
+
+    clearCanvas() {
+      set((state) => {
+        state.clearCanvasFlag += 1;
+        state.tools.brush.color = "#000000";
+        state.tools.brush.opacity = 1;
+        state.tools.brush.style = "solid";
+        state.tools.brush.shape = "none";
+        state.tools.brush.texture = "none";
       });
     },
   }))

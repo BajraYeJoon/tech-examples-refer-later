@@ -50,6 +50,23 @@ const createPattern = (ctx: CanvasRenderingContext2D, type: string) => {
 export const useCanvas = (canvasRef: RefObject<HTMLCanvasElement>) => {
   const { tools, currentTool, setMousePosition } = usePhotoEditorStore();
 
+  useEffect(() => {
+    if (!canvasRef?.current) return;
+    const canvas = canvasRef?.current;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const unsubscribe = usePhotoEditorStore.subscribe((state, prevState) => {
+      if (state.clearCanvasFlag !== prevState.clearCanvasFlag) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (!canvasRef?.current) return;
