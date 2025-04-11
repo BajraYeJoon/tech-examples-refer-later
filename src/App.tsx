@@ -69,6 +69,18 @@ export default function App() {
               >
                 Photo Lite
               </Link>
+              <Link
+                to="/infinite-scroll"
+                className="text-primary hover:text-primary-foreground transition-colors"
+              >
+                Infinite Scroll
+              </Link>
+              <Link
+                to="/animejs"
+                className="text-primary hover:text-primary-foreground transition-colors"
+              >
+                AnimeJS
+              </Link>
             </nav>
           </div>
         </div>

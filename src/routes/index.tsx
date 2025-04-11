@@ -13,6 +13,8 @@ import Profile from "../components/auth/profile";
 import Swapy from "../components/swapy/swapy";
 import Canvas from "../components/canvas/canvas";
 import PhotoLite from "../components/photo-lite";
+import Scroll from "@/components/Scroll/Scroll";
+import Anime from "@/components/anime/Anime";
 
 export const router = createBrowserRouter([
   {
@@ -71,6 +73,14 @@ export const router = createBrowserRouter([
       {
         path: "/photo-lite",
         element: <PhotoLite />,
+      },
+      {
+        path: "/infinite-scroll",
+        element: <Scroll />,
+      },
+      {
+        path: "/animejs",
+        element: <Anime />,
       },
     ],
   },
